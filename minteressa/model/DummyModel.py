@@ -1,4 +1,3 @@
-import os.path
 import json
 
 from minteressa.etl.EtlProcessor import EtlProcessor
