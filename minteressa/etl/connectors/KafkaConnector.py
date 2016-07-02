@@ -43,6 +43,10 @@ class KafkaConnector:
             if logging_topic is not None \
             else "minteressa_stats"
 
+    def listen(self):
+        for msg in self.consumer:
+            print(msg)
+
     def connect(self):
         self.consumer = KafkaConsumer(
             self.consumer_topic,
