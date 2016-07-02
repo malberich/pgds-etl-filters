@@ -1,5 +1,6 @@
-from kafka import KafkaConsumer, KafkaProducer, TopicPartition
+from kafka import KafkaConsumer, KafkaProducer
 import json
+
 
 class KafkaConnector:
     """Simple wrapper class to configure a simple kafka consumer
