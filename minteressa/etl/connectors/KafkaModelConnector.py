@@ -55,27 +55,30 @@ class KafkaModelConnector:
 
     def connect(self):
         self.consumer = KafkaConsumer(
-            [
+            (
                 self.unlabeled_consumer_topic,
                 self.labeled_consumer_topic
-            ],
+            ),
             group_id=self.group_id,
             value_deserializer=json.loads,
             bootstrap_servers=self.bootstrap_servers
         )
         # print("subscribing to %s" % self.consumer_topic)
-        print("Subscribed to topic %s " % self.consumer_topic)
+        print("Subscribed to topic %s, %s " % (
+            self.unlabeled_consumer_topic,
+            self.labeled_consumer_topic
+        ))
 
         self.producer = KafkaProducer(
             bootstrap_servers=self.bootstrap_servers
         )
 
-    def send(self, message, producer_topic=None):
-        producer_topic = producer_topic \
-            if producer_topic is not None \
-            else self.producer_topic
+    def send(self, message, label_request_producer_topic=None):
+        label_request_producer_topic = label_request_producer_topic \
+            if label_request_producer_topic is not None \
+            else self.label_request_producer_topic
 
-        self.producer.send(producer_topic, message)
+        self.producer.send(label_request_producer_topic, message)
         pass
 
     def log(self, message, logging_topic=None):
