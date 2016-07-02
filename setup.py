@@ -10,6 +10,7 @@ setup(
         "minteressa",
         "minteressa.etl",
         "minteressa.etl.connectors",
-        "minteressa.etl.filters"
+        "minteressa.etl.filters",
+        "minteressa.etl.model"
     ]
 )
