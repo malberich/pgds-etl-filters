@@ -10,7 +10,7 @@ RUN cd /opt && rm -Rf src
 RUN mkdir /opt/src /opt/run
 
 # Install minteressa.* modules source
-RUN cd /opt/src && git clone https://github.com/malberich/pgds-etl-filters
+RUN cd /opt/src && git clone https://github.com/malberich/pgds-etl-filters.git
 RUN cd /opt/src/pgds-etl-filters && git pull origin master
 
 RUN  pip install -r /opt/src/pgds-etl-filters/requirements.txt
