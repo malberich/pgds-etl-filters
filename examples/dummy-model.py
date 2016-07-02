@@ -1,4 +1,4 @@
-from minteressa.etl.connectors.KafkaConnector import KafkaModelConnector
+from minteressa.etl.connectors.KafkaModelConnector import KafkaModelConnector
 from minteressa.model.DummyModel import DummyModel
 
 if __name__ == '__main__':
