@@ -15,13 +15,10 @@ class EtlProcessor:
 
         if self.connector is None:
             raise ValueError("Need a valid connector to input and output data")
-
-        if autostart is True:
-            self.start()
-
-    def start(self):
-        self.connector.connect()
+        else:
+            if autostart is True:
+                self.connector.connect()
 
     def listen(self):
         for msg in self.connector.consumer:
-            yield msg
+            print(msg)

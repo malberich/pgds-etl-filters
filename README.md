@@ -42,3 +42,47 @@ Of course you can also run docker in foreground mode, so that you can skip the d
 ```bash
 docker run --net="host" -t pgds-filters-kafka-test
 ```
+## Creating a filter that listens to Kafka
+
+The kafka test script should only be used as a test script.
+
+Please, take a look at the python script `examples/url-filter.py`, as this includes the most basic features for performing a filter.  There are two main elements:
+
+* A Kafka connector configuration.
+* The Filter class that listens to Kafka's tweets (under a given topic) and performs some operations over them.
+
+And the third, a script that binds the two elements above.
+
+As a testing case, you can take a look at the URL filtering case.  The URL filtering discards only allows passing the tweets that at least contain one URL into its body, and discards the others. This allows us to get referential, non-conversational (or not only conversational, at least) tweets.
+
+So how do we perform such task? Enter examples/url-filter.py, and check out this tiny script:
+
+* Import the KafkaConnector, and the corresponding filter (EmptyUrl). If you want to build a filter of your own, please, check out the code of minteressa/etl/filters/EmptyUrl.py to get an idea of how to make it work.
+* Instantiate KafkaConnector by configuring the consumer and producer topics that you want to use. There are more options, but let's keep it simple.
+* Instantiate the filter module.
+
+As a default the module will autostart to listen message and process them, but you can avoid this behavior by setting `autostart=False` when instantiating the EmptyUrl filter. Doing this way the code should look like:
+
+```python
+from minteressa.etl.connectors.KafkaConnector import KafkaConnector
+from minteressa.etl.filters.EmptyUrl import EmptyUrl
+
+if __name__ == '__main__':
+    filter = EmptyUrl(
+        connector=kfk,
+        autostart=False
+    )
+
+    filter.connect()
+    filter.listen()
+```
+
+This will run the
+
+You can also access directly to the consumer message generator by running:
+
+```python
+filter.connect()
+for msg in filter.connector.consumer:
+	# Do whatever you want to do with the message
+```

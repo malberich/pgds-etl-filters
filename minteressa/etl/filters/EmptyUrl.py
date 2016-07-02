@@ -20,11 +20,14 @@ class EmptyUrl(EtlProcessor):
         autostart=True
     ):
         EtlProcessor.__init__(self, connector=connector, autostart=autostart)
-        self.listen()
+
+
+        if autostart is True:
+            self.listen()
 
     def listen(self):
         print(
-            "Listening to messages to consume into '%s'" %
+            "Listening to messages to consume from '%s'" %
             self.connector.consumer_topic
         )
         for msg in self.connector.consumer:
@@ -39,6 +42,10 @@ class EmptyUrl(EtlProcessor):
                             "dest": self.connector.producer_topic
                         })
                     )
+                    print("Passing tweet %s" % tweet['id_str'])
+                else:
+                    print("Discarding tweet %s" % tweet['id_str'])
+
             except KeyError:
                 self.connector.log(
                     json.dumps({
