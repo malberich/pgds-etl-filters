@@ -27,7 +27,7 @@ It may take a while, as it installs and compiles some python and ubuntu packages
 In order to make it run, execute:
 
 ```bash
-docker run --net="host"-d -t pgds-filters-kafka-test
+docker run --net="host" -d -t pgds-filters-kafka-test
 ```
 
 This will start the container. The container gets the tweets to STDOUT, so this means that they can be seen by running docker logs
