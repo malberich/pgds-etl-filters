@@ -9,6 +9,7 @@ setup(
     packages=[
         "minteressa",
         "minteressa.etl",
-        "minteressa.etl.connectors"
+        "minteressa.etl.connectors",
+        "minteressa.etl.filters"
     ]
 )
