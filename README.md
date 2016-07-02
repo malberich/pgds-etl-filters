@@ -37,7 +37,7 @@ docker logs -f $container_id
 ```
 Where $container_id is the identifier of the running container.  This will output all the tweets currently being stored into the current topic.
 
-Of course you can also run docker in foreground mode, so that you can skip the double run. Running the container in foreground will print the tweets in your command line:
+Of course you can also run docker in foreground mode, so that you can skip the double run. Running the container in foreground will print the tweets to the `STDOUT`:
 
 ```bash
 docker run --net="host" -t pgds-filters-kafka-test
