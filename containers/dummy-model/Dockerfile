@@ -4,7 +4,8 @@ RUN apt-get update \
   && apt-get upgrade -y \
   && apt-get clean -y
 
-RUN apt-get install git python2.7 python2.7-dev python-pip build-essential
+RUN apt-get install --no-install-recommends \
+		git python2.7 python2.7-dev python-pip build-essential
 
 WORKDIR /opt
 RUN rm -Rf src
@@ -20,11 +21,14 @@ RUN pip install -r requirements.txt
 RUN python setup.py build && python setup.py install
 
 ### modify those script files in order to run yours ###
-RUN cp examples/nearduplicate-en-filter.py /opt/run/nearduplicate-en-filter.py
+RUN cp examples/dummy-model.py /opt/run/dummy-model.py
 
 WORKDIR /opt
 RUN rm -Rf src
 
+RUN apt-get remove -y python-pip python2.7-dev git build-essential
+RUN rm -rf /var/lib/apt/lists/*
+
 ### TODO check for Kafka service
 ### This script is expected to check for kafka availability ###
-CMD ["python", "/opt/run/nearduplicate-en-filter.py"]
+CMD ["python", "/opt/run/dummy-model.py"]
