@@ -4,7 +4,7 @@ from minteressa.etl.filters.Lang import Lang
 if __name__ == '__main__':
     kfk = KafkaConnector(
     	group_id="lang_filter",
-        consumer_topic="raw_tweets"
+        consumer_topic="url_tweets"
     )
 
     lang_filter = Lang(
