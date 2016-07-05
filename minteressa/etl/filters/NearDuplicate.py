@@ -14,7 +14,6 @@ class NearDuplicate(EtlProcessor):
        in order to detect whether the tweet is duplicate, near-duplicate or
        nothing at all"""
 
-    lsh = None
     punct = re.compile(r"[\.,;:]\\xe2", re.IGNORECASE)
 
     langs = {
@@ -22,12 +21,7 @@ class NearDuplicate(EtlProcessor):
         "en": "english"
     }
 
-    connector = None
-
     process_count = 0
-
-    permutations = 90
-    threshold = 0.8
 
     def __init__(
         self,
@@ -37,20 +31,14 @@ class NearDuplicate(EtlProcessor):
         permutations=90,
         autostart=True
     ):
-        self.permutations = permutations \
-            if permutations is not None \
-            else 90
-
-        self.threshold = threshold \
-            if threshold is not None \
-            else 0.8
-
-        self.lang = lang \
-            if lang is not None \
-            else "en"
+        self.permutations = permutations
+        self.threshold = threshold
+        self.lang = lang
+        self.connector = None
+        self.lsh = None
 
         EtlProcessor.__init__(self, connector=connector, autostart=autostart)
-        if autostart is True:
+        if autostart:
             self.load()
             self.listen()
 
@@ -60,7 +48,7 @@ class NearDuplicate(EtlProcessor):
         for msg in self.connector.consumer:
             tweet = msg.value
             try:
-                if self.is_unique(tweet) is True:
+                if self.is_unique(tweet):
                     self.connector.send(
                         json.dumps(msg.value)
                     )
@@ -103,7 +91,6 @@ class NearDuplicate(EtlProcessor):
                 threshold=self.threshold,
                 num_perm=self.permutations
             )
-        pass
 
     def save(self):
         """Stores the currently processed data for this model"""
@@ -118,7 +105,6 @@ class NearDuplicate(EtlProcessor):
                 'wb+'
             )
         )
-        pass
 
     def replace_urls(self, tweet):
         """Convenience function that replaces the compressed URLs by

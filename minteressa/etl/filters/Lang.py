@@ -3,14 +3,13 @@ import json
 from functools32 import lru_cache
 from minteressa.etl.EtlProcessor import EtlProcessor
 
+
 class Lang(EtlProcessor):
     """A class that acts over the raw tweets collected from the twitter stream
        in order to detect whether the tweet is written into a the required
        language or not. If so, it gets forwared to the next stage. Otherwise
        it gets filtered out"""
 
-    punct = None
-    allowed_langs = []
     langs = {
         "es": "spanish",
         "en": "english"
@@ -22,10 +21,7 @@ class Lang(EtlProcessor):
         connector=None,
         autostart=True
     ):
-        self.allowed_langs = allowed_langs \
-            if allowed_langs is not None \
-            else None
-
+        self.allowed_langs = allowed_langs
         if self.allowed_langs is None:
             raise ValueError("Need at least a language to be selected")
         else:

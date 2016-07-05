@@ -11,14 +11,11 @@ class EtlProcessor:
         connector=None,
         autostart=True
     ):
-        self.connector = connector \
-            if connector is not None \
-            else None
-
+        self.connector = connector
         if self.connector is None:
             raise ValueError("Need a valid connector to input and output data")
         else:
-            if autostart is True:
+            if autostart:
                 self.connector.connect()
 
     def listen(self):

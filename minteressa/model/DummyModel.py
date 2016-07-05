@@ -18,7 +18,7 @@ class DummyModel(EtlProcessor):
         print("Connecting to Kafka...")
         EtlProcessor.__init__(self, connector=connector, autostart=autostart)
 
-        if autostart is True:
+        if autostart:
             self.listen()
 
     def listen(self):
