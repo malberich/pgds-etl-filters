@@ -12,7 +12,6 @@ class EmptyUrl(EtlProcessor):
        nothing at all"""
 
     punct = re.compile(r"(es|en)", re.IGNORECASE)
-    store = None
 
     def __init__(
         self,
@@ -21,8 +20,7 @@ class EmptyUrl(EtlProcessor):
     ):
         EtlProcessor.__init__(self, connector=connector, autostart=autostart)
 
-
-        if autostart is True:
+        if autostart:
             self.listen()
 
     def listen(self):
