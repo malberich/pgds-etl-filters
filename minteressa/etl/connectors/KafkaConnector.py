@@ -1,5 +1,6 @@
 from kafka import KafkaConsumer, KafkaProducer
-import json
+from confluent_kafka import Producer, Consumer, KafkaException, KafkaError
+import sys
 
 
 class KafkaConnector(object):
@@ -26,15 +27,34 @@ class KafkaConnector(object):
         self.producer = None
 
     def listen(self):
-        for msg in self.consumer:
-            print(msg)
+        while True:
+            msg = self.consumer.poll()
+            if msg is None:
+                continue
+            if msg.error():
+                # Error or event
+                if msg.error().code() == KafkaError._PARTITION_EOF:
+                    # End of partition event
+                    sys.stderr.write('%% %s [%d] reached end at offset %d\n' %
+                                     (msg.topic(), msg.partition(), msg.offset()))
+                elif msg.error():
+                    # Error
+                    raise KafkaException(msg.error())
+            else:
+                # Proper message
+                sys.stderr.write('%% %s [%d] at offset %d with key %s:\n' %
+                                 (msg.topic(), msg.partition(), msg.offset(),
+                                  str(msg.key())))
+                return (msg.value())
 
     def connect(self):
-        self.consumer = KafkaConsumer(
-            self.consumer_topic,
-            group_id=self.group_id,
-            value_deserializer=json.loads,
-            bootstrap_servers=self.bootstrap_servers
+        self.consumer = Consumer({
+                'bootstrap.servers': self.bootstrap_servers,
+                'group.id': self.group_id,
+                'default.topic.config': {
+                    'auto.offset.reset': 'smallest'
+                }
+            }
         )
         # print("subscribing to %s" % self.consumer_topic)
         print("Subscribed to topic %s " % self.consumer_topic)
@@ -55,7 +75,7 @@ class KafkaConnector(object):
             if logging_topic is not None \
             else self.logging_topic
 
-        self.producer.send(logging_topic, message)
+        self.producer.produce(logging_topic, message)
 
     def close(self):
         self.consumer.close()

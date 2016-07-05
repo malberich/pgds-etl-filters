@@ -53,6 +53,7 @@ class Lang(EtlProcessor):
                             "dest": lang_topic
                         })
                     )
+                    print("Passing tweet %s" % tweet['id_str'])
                 else:
                     self.connector.log(
                         json.dumps({
@@ -61,7 +62,9 @@ class Lang(EtlProcessor):
                             "dest": "discard"
                         })
                     )
+                    print("Discarding tweet %s" % tweet['id_str'])
             except KeyError:
+                print("Key error on tweet %s" % tweet['id_str'])
                 self.connector.log(
                     json.dumps({
                         "id_str": tweet['id_str'],
@@ -71,6 +74,7 @@ class Lang(EtlProcessor):
                 )
                 continue
             except ValueError:
+                print("Value error on tweet %s" % tweet['id_str'])
                 self.connector.log(
                     json.dumps({
                         "id_str": tweet['id_str'],
