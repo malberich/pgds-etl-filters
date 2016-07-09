@@ -1,4 +1,3 @@
-from kafka import KafkaConsumer, KafkaProducer
 from confluent_kafka import Producer, Consumer, KafkaException, KafkaError
 import sys
 
@@ -14,7 +13,7 @@ class KafkaConnector(object):
         consumer_topic='consumer_limbo',
         producer_topic='consumer_limbo',
         logging_topic='minteressa_stats',
-        bootstrap_servers='127.0.0.1:9092'
+        bootstrap_servers='kafka:9092'
     ):
 
         self.group_id = group_id
@@ -35,40 +34,59 @@ class KafkaConnector(object):
                 # Error or event
                 if msg.error().code() == KafkaError._PARTITION_EOF:
                     # End of partition event
-                    sys.stderr.write('%% %s [%d] reached end at offset %d\n' %
-                                     (msg.topic(), msg.partition(), msg.offset()))
+                    sys.stderr.write(
+                        '%% %s [%d] reached end at offset %d\n' % (
+                            msg.topic(),
+                            msg.partition(),
+                            msg.offset()
+                        )
+                    )
                 elif msg.error():
                     # Error
                     raise KafkaException(msg.error())
             else:
                 # Proper message
-                sys.stderr.write('%% %s [%d] at offset %d with key %s:\n' %
-                                 (msg.topic(), msg.partition(), msg.offset(),
-                                  str(msg.key())))
-                return (msg.value())
+                sys.stdout.write(
+                    '%s [partition-%d] at offset %d with key %s:\n' %
+                    (
+                        msg.topic(),
+                        msg.partition(),
+                        msg.offset(),
+                        str(msg.key())
+                    )
+                )
+                yield msg
 
     def connect(self):
         self.consumer = Consumer({
-                'bootstrap.servers': self.bootstrap_servers,
-                'group.id': self.group_id,
-                'default.topic.config': {
-                    'auto.offset.reset': 'smallest'
-                }
+            'bootstrap.servers': self.bootstrap_servers,
+            'group.id': self.group_id,
+            'default.topic.config': {
+                'auto.offset.reset': 'smallest'
             }
-        )
-        # print("subscribing to %s" % self.consumer_topic)
+        })
+        print("subscribing to %s" % self.consumer_topic)
+        self.consumer.subscribe([
+            self.consumer_topic
+        ])
         print("Subscribed to topic %s " % self.consumer_topic)
 
-        self.producer = KafkaProducer(
-            bootstrap_servers=self.bootstrap_servers
-        )
+        self.producer = Producer({
+            'bootstrap.servers': self.bootstrap_servers,
+            'group.id': self.group_id
+        })
 
     def send(self, message, producer_topic=None):
         producer_topic = producer_topic \
             if producer_topic is not None \
             else self.producer_topic
 
-        self.producer.send(producer_topic, message)
+        self.producer.produce(
+            producer_topic,
+            message
+        )
+        # self.producer.flush()
+
 
     def log(self, message, logging_topic=None):
         logging_topic = logging_topic \
@@ -76,6 +94,7 @@ class KafkaConnector(object):
             else self.logging_topic
 
         self.producer.produce(logging_topic, message)
+        self.producer.flush()
 
     def close(self):
         self.consumer.close()
