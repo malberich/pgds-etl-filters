@@ -11,6 +11,7 @@ setup(
         "minteressa.etl",
         "minteressa.etl.connectors",
         "minteressa.etl.filters",
+        "minteressa.etl.mappers",
         "minteressa.model"
     ]
 )
