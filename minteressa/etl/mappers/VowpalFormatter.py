@@ -2,7 +2,7 @@ import collections
 import string
 
 
-class VowpalFormatter():
+class VowpalFormatter(object):
     """Takes raw unique tweets and extracts their features"""
 
     """features is a dictionary pointing to the positions of the features
