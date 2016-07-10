@@ -45,12 +45,12 @@ class NearDuplicate(EtlProcessor):
     def listen(self):
         """Performs a model check on whether the current tweet
         resembles at least to a 80% level as other previous tweets"""
-        for msg in self.connector.consumer:
-            tweet = msg.value
+        for msg in self.connector.listen():
+            tweet = json.loads(msg.value())
             try:
                 if self.is_unique(tweet):
                     self.connector.send(
-                        json.dumps(msg.value)
+                        msg.value()
                     )
                     self.connector.log(
                         json.dumps({
@@ -75,10 +75,10 @@ class NearDuplicate(EtlProcessor):
 
     def load(self):
         """Loads the stored model data from previous runs"""
-        if os.path.isfile('./data/minhash-%s-%.2f.pkl' % (self.lang, self.threshold)):
+        if os.path.isfile('./minhash-%s-%.2f.pkl' % (self.lang, self.threshold)):
             self.lsh = pickle.load(
                 open(
-                    'minhash-%s--%d-%.2f.pkl' % (
+                    './minhash-%s--%d-%.2f.pkl' % (
                         self.lang,
                         self.permutations,
                         self.threshold
@@ -97,7 +97,7 @@ class NearDuplicate(EtlProcessor):
         pickle.dump(
             self.lsh,
             open(
-                './data/minhash-%s--%d-%.2f.pkl' % (
+                './minhash-%s--%d-%.2f.pkl' % (
                     self.lang,
                     self.permutations,
                     self.threshold

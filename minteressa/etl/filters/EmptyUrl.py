@@ -1,7 +1,6 @@
 import re
 import json
-import logging
-from functools32 import lru_cache
+import sys
 
 from minteressa.etl.EtlProcessor import EtlProcessor
 
@@ -24,15 +23,11 @@ class EmptyUrl(EtlProcessor):
             self.listen()
 
     def listen(self):
-        print(
-            "Listening to messages to consume from '%s'" %
-            self.connector.consumer_topic
-        )
-        for msg in self.connector.consumer:
+        for msg in self.connector.listen():
             try:
-                tweet = msg.value
+                tweet = json.loads(msg.value())
                 if len(tweet['entities']['urls']) > 0:
-                    self.connector.send(json.dumps(msg.value))
+                    self.connector.send(msg.value())
                     self.connector.log(
                         json.dumps({
                             "id_str": tweet['id_str'],
@@ -40,9 +35,9 @@ class EmptyUrl(EtlProcessor):
                             "dest": self.connector.producer_topic
                         })
                     )
-                    print("Passing tweet %s" % tweet['id_str'])
+                    sys.stdout.write("Passing tweet %s" % tweet['id_str'])
                 else:
-                    print("Discarding tweet %s" % tweet['id_str'])
+                    sys.stdout.write("Discarding tweet %s" % tweet['id_str'])
 
             except KeyError:
                 self.connector.log(

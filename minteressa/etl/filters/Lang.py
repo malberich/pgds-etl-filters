@@ -1,3 +1,4 @@
+import sys
 import re
 import json
 from functools32 import lru_cache
@@ -37,13 +38,13 @@ class Lang(EtlProcessor):
             self.listen()
 
     def listen(self):
-        for msg in self.connector.consumer:
+        for msg in self.connector.listen():
             try:
-                tweet = msg.value
+                tweet = json.loads(msg.value())
                 if self.is_valid(tweet['lang']):
                     lang_topic = "%s_tweets" % tweet['lang']
                     self.connector.send(
-                        json.dumps(msg.value),
+                        msg.value(),
                         producer_topic="%s_tweets" % tweet['lang']
                     )
                     self.connector.log(
