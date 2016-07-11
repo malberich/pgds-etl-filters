@@ -1,0 +1,25 @@
+Initializing Vowpal format generator
+Starting VW in the background
+/usr/local/bin/vw --daemon --save_resume --pid_file ./vw.pid --mellowness 0.005 -f final_regressor.vw --readable_model readable_final_regressor.vw --save_per_pass --port 26542 --loss_function hinge --quiet --no_stdin --active &
+Initializing Vowpal Wabbit
+Done. Listening
+Seeding vowpal with train data from 'isis-classified.train.vw'...
+VW trained, now predicting CV data from 'isis-classified.test.vw'...
+ t742049796077146112|text rt npr 50 people dead 53 injured in this morning s shooting at a gay nightclub in orlando fla 2a 
+Select (1) or discard (0)? None: {"dest": "label_request", "source": "isis-classified.test.vw", "id_str": "742049796077146112"}
+ t742049796089778180|text rt csinaco pos florida imam tells reporters do not sensationalize your flock of rabid maniacs is the problem banisalam 
+Select (1) or discard (0)? None: {"dest": "label_request", "source": "isis-classified.test.vw", "id_str": "742049796089778180"}
+ t742049796073136128|text appreciate the congrats okay congrats 50 people are dead 8apgrqye
+Select (1) or discard (0)?  t742049796094107648|text el malquerido es premiada como mejor pelicula del festival del cine venezolano cine 8ffbihwu6a
+Select (1) or discard (0)?  t742049800280023044|text 1 2 tickets russland slowakei russia vs slovakia lille 15 06 2016 block l22 eur 35 4oyvarpfes
+Select (1) or discard (0)?  t742049800284213248|text rt melonie beilman watch cam newton sings usher s nice and slow just another reason to love the nfl mvp 52pkp
+Select (1) or discard (0)?  t742049800292438016|text rt rainbows rgd join 5ifiemw6g2
+Select (1) or discard (0)? None: {"dest": "label_request", "source": "isis-classified.test.vw", "id_str": "742049800292438016"}
+ t742049800263065600|text rt pollaprenadora sign up amp enjoy 8 webcamgirls online freechat cybersex 8jh4g7pyuu
+Select (1) or discard (0)?  t742049804457529344|text insaurralde y massa juntos por los clubes de barrio y dejaron un mensaje opositor al gobierno de mauriciomacri 7vovftvjv
+Select (1) or discard (0)? 
+warning: save_testmodel.vw is not a good float, replacing with 0
+You are using label 0 not -1 or 1 as loss function expects!
+You are using label 0 not -1 or 1 as loss function expects!
+ t742049804461580288|text jijijiji 26ywtca
+Select (1) or discard (0)? 
