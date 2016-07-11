@@ -5,7 +5,11 @@ RUN apt-get update && \
   apt-get install -y \
   	--no-install-recommends \
     python2.7 \
+    build-essential \
+    autotools-dev \
     libtool \
+    gcc \
+    g++ \
   	python2.7-dev \
   	python-pip \
   	libboost-program-options-dev \
@@ -20,12 +24,13 @@ RUN git clone https://github.com/JohnLangford/vowpal_wabbit.git
 RUN git clone https://github.com/edenhill/librdkafka.git
 
 WORKDIR /opt/src/vowpal_wabbit
-RUN ./configure
+# RUN ./configure
 RUN make
 RUN make install
 
 WORKDIR /opt/src/librdkafka
-RUN sh configure
+RUN git checkout tags/0.9.1
+RUN ./configure
 RUN make
 RUN make install
 
@@ -43,7 +48,9 @@ WORKDIR /opt/src
 RUN rm minteressa -Rf
 RUN rm vowpal_wabbit -Rf
 RUN rm librdkafka -Rf
-RUN apt-get -y remove --purgue git python2.7-dev python-pip libboost-python-dev libboost-program-options-dev
+RUN rm -rf /var/lib/apt/lists/*
+
+RUN apt-get -y remove --purge git python2.7-dev build-essential python-pip libboost-python-dev libboost-program-options-dev
 RUN apt-get -y autoremove
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
