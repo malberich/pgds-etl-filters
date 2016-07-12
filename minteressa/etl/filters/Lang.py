@@ -1,8 +1,8 @@
-import sys
 import re
 import json
 from functools32 import lru_cache
 from minteressa.etl.EtlProcessor import EtlProcessor
+from minteressa.metrics.GraphiteClient import GraphiteClient
 
 
 class Lang(EtlProcessor):
@@ -32,7 +32,7 @@ class Lang(EtlProcessor):
                 ")",
                 re.IGNORECASE
             )
-
+        self.graphite = GraphiteClient(["etl.lang.es", "etl.lang.en", "etl.lang.discarded", "etl.lang.error"])
         EtlProcessor.__init__(self, connector=connector, autostart=autostart)
         if autostart is True:
             self.listen()
@@ -54,7 +54,7 @@ class Lang(EtlProcessor):
                             "dest": lang_topic
                         })
                     )
-                    print("Passing tweet %s" % tweet['id_str'])
+                    self.graphite.batch("lang.%s" % tweet['lang'], 1)
                 else:
                     self.connector.log(
                         json.dumps({
@@ -63,7 +63,8 @@ class Lang(EtlProcessor):
                             "dest": "discard"
                         })
                     )
-                    print("Discarding tweet %s" % tweet['id_str'])
+                    self.graphite.batch("etl.lang.discard", 1)
+                    
             except KeyError:
                 print("Key error on tweet %s" % tweet['id_str'])
                 self.connector.log(
@@ -73,6 +74,7 @@ class Lang(EtlProcessor):
                         "dest": "error"
                     })
                 )
+                self.graphite.batch("etl.lang.error", 1)
                 continue
             except ValueError:
                 print("Value error on tweet %s" % tweet['id_str'])
@@ -83,6 +85,7 @@ class Lang(EtlProcessor):
                         "dest": "error"
                     })
                 )
+                self.graphite.batch("etl.lang.error", 1)
                 continue
 
     @lru_cache(maxsize=200)

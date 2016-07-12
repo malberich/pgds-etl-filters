@@ -7,6 +7,7 @@ import cPickle as pickle
 from functools32 import lru_cache
 from datasketch import MinHash, MinHashLSH
 from minteressa.etl.EtlProcessor import EtlProcessor
+from minteressa.metrics.GraphiteClient import GraphiteClient
 
 
 class NearDuplicate(EtlProcessor):
@@ -36,6 +37,7 @@ class NearDuplicate(EtlProcessor):
         self.lang = lang
         self.connector = None
         self.lsh = None
+        self.graphite = GraphiteClient(["etl.nd.en", "etl.nd.es", "etl.nd.error", "lang_error"])
 
         EtlProcessor.__init__(self, connector=connector, autostart=autostart)
         if autostart:
@@ -59,6 +61,7 @@ class NearDuplicate(EtlProcessor):
                             "dest": self.connector.producer_topic
                         })
                     )
+                    self.graphite.batch("etl.nd.%s" % tweet['lang'], 1)
             except ValueError:
                 self.connector.send(
                     json.dumps({
@@ -67,6 +70,7 @@ class NearDuplicate(EtlProcessor):
                         "dest": "error"
                     })
                 )
+                self.graphite.batch("etl.nd.error", 1)
                 continue
             finally:
                 self.process_count += 1
@@ -158,6 +162,7 @@ class NearDuplicate(EtlProcessor):
                     is_unique_tweet = True
                 except ValueError:
                     logging.error(ValueError)
+                    self.graphite.batch("etl.nd.error", 1)
             else:
                 # nondupe
                 for tweet_idx in similars:

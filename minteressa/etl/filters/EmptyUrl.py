@@ -3,6 +3,7 @@ import json
 import sys
 
 from minteressa.etl.EtlProcessor import EtlProcessor
+from minteressa.metrics.GraphiteClient import GraphiteClient
 
 
 class EmptyUrl(EtlProcessor):
@@ -18,7 +19,7 @@ class EmptyUrl(EtlProcessor):
         autostart=True
     ):
         EtlProcessor.__init__(self, connector=connector, autostart=autostart)
-
+        self.graphite = GraphiteClient(["etl.url.discard", "etl.url.ok", "etl.url.error"])
         if autostart:
             self.listen()
 
@@ -35,9 +36,9 @@ class EmptyUrl(EtlProcessor):
                             "dest": self.connector.producer_topic
                         })
                     )
-                    sys.stdout.write("Passing tweet %s" % tweet['id_str'])
+                    self.graphite.batch("etl.url.ok", 1)
                 else:
-                    sys.stdout.write("Discarding tweet %s" % tweet['id_str'])
+                    self.graphite.batch("etl.url.discard", 1)
 
             except KeyError:
                 self.connector.log(
@@ -47,6 +48,7 @@ class EmptyUrl(EtlProcessor):
                         "dest": "discard"
                     })
                 )
+                self.graphite.batch("etl.url.error", 1)
                 continue
             except ValueError:
                 self.connector.log(
@@ -56,4 +58,5 @@ class EmptyUrl(EtlProcessor):
                         "dest": "discard"
                     })
                 )
+                self.graphite.batch("etl.url.error", 1)
                 continue
